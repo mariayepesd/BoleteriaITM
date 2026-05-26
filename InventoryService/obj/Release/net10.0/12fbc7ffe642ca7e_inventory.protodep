@@ -1,0 +1,2 @@
+obj\Release\net10.0\Protos/Inventory.cs \
+obj\Release\net10.0\Protos/InventoryGrpc.cs: Protos/inventory.proto

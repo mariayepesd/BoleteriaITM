@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/Elementos de la solución/">
+    <File Path="docker-compose.yml" />
+  </Folder>
+  <Project Path="ApiGateway/ApiGateway.csproj" Id="7ddf486c-e8c3-4a96-8015-95230ac8c547" />
+  <Project Path="BoleteriaITM/BoleteriaITM.csproj" />
+  <Project Path="InventoryService/InventoryService.csproj" Id="af786ca9-6723-4165-935d-2f903bc572b2" />
+  <Project Path="OrderService/OrderService.csproj" Id="95afbfb4-c094-4f79-a1d7-0c5bbb073d55" />
+</Solution>

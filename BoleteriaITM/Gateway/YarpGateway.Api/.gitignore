@@ -1,0 +1,32 @@
+## Carpetas de compilación y salida
+bin/
+obj/
+.vs/
+.vscode/
+*.DotSettings
+
+## Logs
+logs/
+*.log
+*.txt
+
+## Dependencias
+packages/
+.paket/paket.exe
+
+## IDE
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+## Certificados (desarrollo)
+*.pem
+*.pfx
+*.cer
+
+## Archivos temporales
+temp/
+tmp/
+*.tmp

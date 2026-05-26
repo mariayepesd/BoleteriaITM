@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  # --- BASE DE DATOS SQL SERVER ---
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: itm_festival_sqlserver
+    environment:
+      SA_PASSWORD: "ITM_Festival_2026!"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Express"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - festival_network
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'ITM_Festival_2026!' -Q 'SELECT 1' -No"]
+      interval: 10s
+      retries: 10
+      start_period: 30s
+
+  # --- MENSAJERÍA ASÍNCRONA (MassTransit + RabbitMQ) ---
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: itm_festival_rabbitmq
+    ports:
+      - "5672:5672"     # Puerto de comunicación AMQP
+      - "15672:15672"   # Puerto de la UI de Administración
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - festival_network
+
+  # --- CACHÉ DISTRIBUIDA (Price.Api) ---
+  redis:
+    image: redis:7-alpine
+    container_name: itm_festival_redis
+    ports:
+      - "6379:6379"     # Puerto estándar de Redis
+    command: redis-server --appendonly yes # Persistencia de datos básica
+    volumes:
+      - redis_data:/data
+    networks:
+      - festival_network
+
+  # --- BUSCADOR INTELIGENTE: TEXTO (Search.Api) ---
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
+    container_name: itm_festival_elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false # Deshabilitado solo para desarrollo local ágil
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m" # Límites de memoria para que no sature tu PC
+    ports:
+      - "9200:9200"     # API HTTP de Elasticsearch
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - festival_network
+
+  # --- BUSCADOR INTELIGENTE: SEMÁNTICA IA (Search.Api) ---
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: itm_festival_qdrant
+    ports:
+      - "6333:6333"     # API HTTP
+      - "6334:6334"     # Puerto gRPC (ideal para máxima velocidad)
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - festival_network
+
+# --- RED INTERNA DEL ECOSISTEMA ---
+networks:
+  festival_network:
+    driver: bridge
+
+# --- VOLÚMENES PERSISTENTES ---
+volumes:
+  sqlserver_data:
+  rabbitmq_data:
+  redis_data:
+  elasticsearch_data:
+  qdrant_data:

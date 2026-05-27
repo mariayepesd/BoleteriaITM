@@ -43,6 +43,7 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -104,7 +105,7 @@ app.MapPost("/api/inventory/reduce", async (ReduceStockDto request, FestivalInve
     await db.SaveChangesAsync();
 
     return Results.Ok(new { Message = "Stock reservado correctamente", NuevoStock = item.StockDisponible });
-}).RequireAuthorization("AdminOnly");
+}); // interno: llamado por OrderService (SAGA), no requiere JWT de usuario
 
 // POST /api/inventory/release — Devuelve stock (Compensación SAGA)
 app.MapPost("/api/inventory/release", async (ReduceStockDto request, FestivalInventoryDbContext db) =>
@@ -121,5 +122,6 @@ app.MapPost("/api/inventory/release", async (ReduceStockDto request, FestivalInv
 
 // Servicio gRPC para consultas internas de stock (usado por otros microservicios)
 app.MapGrpcService<GrpcInventoryService>();
+app.MapHealthChecks("/health");
 
 app.Run();

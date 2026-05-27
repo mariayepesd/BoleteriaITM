@@ -21,6 +21,8 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.InstanceName = "FestivalPrices:";
 });
 
+builder.Services.AddHealthChecks();
+
 var app = builder.Build();
 
 // --- Aplica migraciones al arrancar ---
@@ -35,6 +37,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.MapHealthChecks("/health");
 
 // ===========================================================================
 // GET /api/prices/{boleteriaItemId}

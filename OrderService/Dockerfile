@@ -1,31 +1,16 @@
-
-
-# ==========================================
-# ETAPA 1: Compilación (Entorno del SDK)
-# ==========================================
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build-env
 WORKDIR /src
 
-# 1. Copiar el archivo de proyecto y restaurar paquetes NuGet
-# (Asegúrate de que el nombre del .csproj coincida)
-COPY ["OrderService.csproj", "./"]
-RUN dotnet restore "OrderService.csproj"
+COPY ["Festival.Contracts/Festival.Contracts.csproj", "Festival.Contracts/"]
+COPY ["OrderService/OrderService.csproj", "OrderService/"]
+RUN dotnet restore "OrderService/OrderService.csproj"
 
-# 2. Copiar todo el código fuente y compilar la app internamente
 COPY . .
+WORKDIR "/src/OrderService"
 RUN dotnet publish "OrderService.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-# ==========================================
-# ETAPA 2: Ejecución (Entorno de Runtime ligero)
-# ==========================================
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
-
-# Mantener los puertos que ya tenías configurados
 EXPOSE 8080
-EXPOSE 8443
-
-# Copiar los archivos compilados desde la Etapa 1
 COPY --from=build-env /app/publish .
-
 ENTRYPOINT ["dotnet", "OrderService.dll"]

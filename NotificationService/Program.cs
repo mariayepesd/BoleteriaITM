@@ -1,34 +1,41 @@
 using MassTransit;
-using Microsoft.AspNetCore.SignalR;
-using Festival.Contracts;
+using NotificationService.Consumers;
 using NotificationService.Hubs;
 
-namespace NotificationService.Consumers;
+var builder = WebApplication.CreateBuilder(args);
 
-public class OrderConfirmedConsumer : IConsumer<OrderConfirmedEvent>
+// --- SignalR para notificaciones en tiempo real ---
+builder.Services.AddSignalR();
+
+// --- CORS: permite conexiones WebSocket desde la app MAUI ---
+builder.Services.AddCors(options =>
 {
-    // 1. Cambiamos el nombre aquí para evitar que choque con otra cosa
-    private readonly IHubContext<TicketHub> _ticketHub;
+    options.AddDefaultPolicy(policy =>
+        policy.SetIsOriginAllowed(_ => true)
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials());
+});
 
-    public OrderConfirmedConsumer(IHubContext<TicketHub> hubContext)
+// --- MassTransit + RabbitMQ ---
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<OrderConfirmedConsumer>();
+
+    x.UsingRabbitMq((context, cfg) =>
     {
-        // 2. Asignamos el parámetro al nuevo nombre
-        _ticketHub = hubContext;
-    }
+        cfg.Host(builder.Configuration["RabbitMQ:Host"] ?? "amqp://guest:guest@localhost:5672");
+        cfg.ConfigureEndpoints(context);
+    });
+});
 
-    public async Task Consume(ConsumeContext<OrderConfirmedEvent> context)
-    {
-        var orden = context.Message;
+builder.Services.AddHealthChecks();
 
-        await Task.Delay(2000);
-        string urlBoleta = $"https://storage.itm.edu.co/tickets/{orden.OrderId}.pdf";
+var app = builder.Build();
 
-        // 3. Usamos la variable renombrada libre de ambigüedades
-        await _ticketHub.Clients.Group(orden.CustomerId).SendAsync("ReceiveTicketReady", new
-        {
-            OrderId = orden.OrderId,
-            TicketUrl = urlBoleta,
-            Message = "¡Tu boleta para el Festival ya está lista!"
-        });
-    }
-}
+app.UseCors();
+
+app.MapHub<TicketHub>("/hubs/tickets");
+app.MapHealthChecks("/health");
+
+app.Run();

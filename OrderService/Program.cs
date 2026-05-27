@@ -7,6 +7,9 @@ using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Http.Resilience;
 
+// Requerido para gRPC sobre HTTP sin TLS en Docker
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
@@ -19,17 +22,18 @@ builder.Services.AddDbContext<FestivalOrdersDbContext>(options =>
 // --- Cliente gRPC hacia InventoryService ---
 builder.Services.AddGrpcClient<InventoryService.InventoryServiceClient>(o =>
 {
-    o.Address = new Uri("https://localhost:7198");
+    o.Address = new Uri(builder.Configuration["ServiceUrls:InventoryGrpc"] ?? "http://localhost:5273");
 });
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<CorrelationIdDelegatingHandler>();
+builder.Services.AddHealthChecks();
 
 // --- Clientes HTTP con resiliencia y propagación de Correlation ID ---
 builder.Services
     .AddHttpClient("InventoryClient", client =>
     {
-        client.BaseAddress = new Uri("http://localhost:5273");
+        client.BaseAddress = new Uri(builder.Configuration["ServiceUrls:Inventory"] ?? "http://localhost:5273");
         client.Timeout = TimeSpan.FromSeconds(5);
     })
     .AddHttpMessageHandler<CorrelationIdDelegatingHandler>()
@@ -38,7 +42,7 @@ builder.Services
 builder.Services
     .AddHttpClient("PriceClient", client =>
     {
-        client.BaseAddress = new Uri("http://localhost:5280");
+        client.BaseAddress = new Uri(builder.Configuration["ServiceUrls:Price"] ?? "http://localhost:5285");
         client.Timeout = TimeSpan.FromSeconds(5);
     })
     .AddHttpMessageHandler<CorrelationIdDelegatingHandler>()
@@ -49,7 +53,7 @@ builder.Services.AddMassTransit(x =>
 {
     x.UsingRabbitMq((context, cfg) =>
     {
-        cfg.Host("amqps://wqwoltap:bYzWB8MvzX891TQSA8YY5HB8ePSdLWda@turkey.rmq.cloudamqp.com/wqwoltap");
+        cfg.Host(builder.Configuration["RabbitMQ:Host"] ?? "amqp://guest:guest@localhost:5672");
     });
 });
 
@@ -67,6 +71,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.MapHealthChecks("/health");
 
 // POST /api/orders — Crea una orden con patrón SAGA orquestado
 app.MapPost("/api/orders", async (CreateOrderDto dto, IHttpClientFactory factory, FestivalOrdersDbContext db, HttpContext ctx, IPublishEndpoint publishEndpoint) =>

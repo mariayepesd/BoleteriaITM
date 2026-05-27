@@ -190,6 +190,32 @@ services:
       retries: 3
       start_period: 40s
 
+  # --- BUSCADOR INTELIGENTE (SearchService: Elasticsearch + Qdrant) ---
+  search-service:
+    build:
+      context: ./SearchService
+      dockerfile: Dockerfile
+    container_name: itm_festival_search_service
+    ports:
+      - "5295:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: "http://+:8080"
+      Elasticsearch__Url: "http://elasticsearch:9200"
+      Qdrant__Host: "qdrant"
+      Qdrant__Port: "6334"
+    depends_on:
+      - elasticsearch
+      - qdrant
+    networks:
+      - festival_network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
   # --- PUERTA DE ENLACE (API Gateway con YARP avanzado) ---
   api-gateway:
     build:

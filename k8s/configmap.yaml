@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: festival-config
+  namespace: festival
+data:
+  ASPNETCORE_ENVIRONMENT:       "Production"
+  ServiceUrls__Inventory:       "http://inventory-service:8080"
+  ServiceUrls__InventoryGrpc:   "http://inventory-service:8080"
+  ServiceUrls__Price:           "http://price-service:8080"
+  RabbitMQ__Host:               "amqp://guest:guest@rabbitmq:5672"
+  Redis__ConnectionString:      "redis-master:6379"
+  Elasticsearch__Url:           "http://elasticsearch-master:9200"
+  Qdrant__Host:                 "qdrant"
+  Qdrant__Port:                 "6334"
+---
+# ⚠️  En producción real, mover las contraseñas a kubernetes Secrets
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-credentials
+  namespace: festival
+type: Opaque
+stringData:
+  inventory-connection: "Server=sqlserver;Database=FestivalInventoryDb;User Id=sa;Password=ITM_Festival_2026!;TrustServerCertificate=True;"
+  order-connection:     "Server=sqlserver;Database=FestivalOrdersDb;User Id=sa;Password=ITM_Festival_2026!;TrustServerCertificate=True;"
+  price-connection:     "Server=sqlserver;Database=FestivalPricesDb;User Id=sa;Password=ITM_Festival_2026!;TrustServerCertificate=True;"

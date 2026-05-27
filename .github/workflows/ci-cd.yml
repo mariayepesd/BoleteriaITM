@@ -1,0 +1,121 @@
+name: CI/CD — Build, Test & Push to Docker Hub
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  DOTNET_VERSION: '10.0.x'
+
+jobs:
+  # ─── JOB 1: Compilar y probar ──────────────────────────────────────────────
+  build-and-test:
+    name: Build & Test (.NET ${{ env.DOTNET_VERSION }})
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restaurar dependencias
+        run: |
+          dotnet restore InventoryService/InventoryService.csproj
+          dotnet restore OrderService/OrderService.csproj
+          dotnet restore NotificationService/NotificationService.csproj
+          dotnet restore PriceService/PriceService.csproj
+          dotnet restore SearchService/SearchService.csproj
+          dotnet restore BoleteriaITM/Gateway/YarpGateway.Api/YarpGateway.Api.csproj
+
+      - name: Compilar todos los servicios
+        run: |
+          dotnet build InventoryService/InventoryService.csproj        --no-restore -c Release
+          dotnet build OrderService/OrderService.csproj                --no-restore -c Release
+          dotnet build NotificationService/NotificationService.csproj  --no-restore -c Release
+          dotnet build PriceService/PriceService.csproj                --no-restore -c Release
+          dotnet build SearchService/SearchService.csproj              --no-restore -c Release
+          dotnet build BoleteriaITM/Gateway/YarpGateway.Api/YarpGateway.Api.csproj --no-restore -c Release
+
+      - name: Ejecutar pruebas
+        run: dotnet test --no-build --verbosity normal
+        continue-on-error: true  # no hay tests aún; no bloquea el pipeline
+
+  # ─── JOB 2: Build & Push imágenes Docker ───────────────────────────────────
+  docker-push:
+    name: Docker Build & Push → Docker Hub
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Login a Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build & Push — InventoryService
+        uses: docker/build-push-action@v5
+        with:
+          context: ./InventoryService
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/boleteria-inventory:latest
+
+      - name: Build & Push — OrderService
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: OrderService/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/boleteria-order:latest
+
+      - name: Build & Push — NotificationService
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: NotificationService/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/boleteria-notification:latest
+
+      - name: Build & Push — PriceService
+        uses: docker/build-push-action@v5
+        with:
+          context: ./PriceService
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/boleteria-price:latest
+
+      - name: Build & Push — SearchService
+        uses: docker/build-push-action@v5
+        with:
+          context: ./SearchService
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/boleteria-search:latest
+
+      - name: Build & Push — API Gateway (YARP)
+        uses: docker/build-push-action@v5
+        with:
+          context: ./BoleteriaITM/Gateway/YarpGateway.Api
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/boleteria-gateway:latest
+
+      - name: Resumen del push
+        run: |
+          echo "### Imágenes publicadas en Docker Hub ✅" >> $GITHUB_STEP_SUMMARY
+          echo "- \`${{ secrets.DOCKERHUB_USERNAME }}/boleteria-inventory:latest\`"  >> $GITHUB_STEP_SUMMARY
+          echo "- \`${{ secrets.DOCKERHUB_USERNAME }}/boleteria-order:latest\`"      >> $GITHUB_STEP_SUMMARY
+          echo "- \`${{ secrets.DOCKERHUB_USERNAME }}/boleteria-notification:latest\`" >> $GITHUB_STEP_SUMMARY
+          echo "- \`${{ secrets.DOCKERHUB_USERNAME }}/boleteria-price:latest\`"      >> $GITHUB_STEP_SUMMARY
+          echo "- \`${{ secrets.DOCKERHUB_USERNAME }}/boleteria-search:latest\`"     >> $GITHUB_STEP_SUMMARY
+          echo "- \`${{ secrets.DOCKERHUB_USERNAME }}/boleteria-gateway:latest\`"    >> $GITHUB_STEP_SUMMARY

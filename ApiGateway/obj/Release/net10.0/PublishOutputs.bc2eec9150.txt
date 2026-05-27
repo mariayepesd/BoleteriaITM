@@ -1,0 +1,15 @@
+C:\Users\MajoY\source\repos\BoleteriaITM\bin\ApiGateway\publish\ApiGateway.exe
+C:\Users\MajoY\source\repos\BoleteriaITM\bin\ApiGateway\publish\appsettings.json
+C:\Users\MajoY\source\repos\BoleteriaITM\bin\ApiGateway\publish\ApiGateway.dll
+C:\Users\MajoY\source\repos\BoleteriaITM\bin\ApiGateway\publish\ApiGateway.deps.json
+C:\Users\MajoY\source\repos\BoleteriaITM\bin\ApiGateway\publish\ApiGateway.runtimeconfig.json
+C:\Users\MajoY\source\repos\BoleteriaITM\bin\ApiGateway\publish\ApiGateway.pdb
+C:\Users\MajoY\source\repos\BoleteriaITM\bin\ApiGateway\publish\Microsoft.AspNetCore.OpenApi.dll
+C:\Users\MajoY\source\repos\BoleteriaITM\bin\ApiGateway\publish\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\MajoY\source\repos\BoleteriaITM\bin\ApiGateway\publish\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\MajoY\source\repos\BoleteriaITM\bin\ApiGateway\publish\Microsoft.IdentityModel.Logging.dll
+C:\Users\MajoY\source\repos\BoleteriaITM\bin\ApiGateway\publish\Microsoft.IdentityModel.Tokens.dll
+C:\Users\MajoY\source\repos\BoleteriaITM\bin\ApiGateway\publish\Microsoft.OpenApi.dll
+C:\Users\MajoY\source\repos\BoleteriaITM\bin\ApiGateway\publish\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\MajoY\source\repos\BoleteriaITM\bin\ApiGateway\publish\System.IO.Hashing.dll
+C:\Users\MajoY\source\repos\BoleteriaITM\bin\ApiGateway\publish\Yarp.ReverseProxy.dll

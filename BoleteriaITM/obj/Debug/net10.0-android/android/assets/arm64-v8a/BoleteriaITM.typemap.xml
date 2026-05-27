@@ -1,4 +1,4 @@
-<api type="debug" assembly-name="BoleteriaITM" mvid="409a92deb58d45ccb8ba2b391279084c">
+<api type="debug" assembly-name="BoleteriaITM" mvid="c47be9d9770f4811b8b2826a76010781">
   <java-to-managed>
     <entry java-name="crc640bd0c80bc5719b0a/MainActivity" managed-name="BoleteriaITM.MainActivity, BoleteriaITM" managed-type-token-id="33554442" />
     <entry java-name="crc640bd0c80bc5719b0a/MainApplication" managed-name="BoleteriaITM.MainApplication, BoleteriaITM" managed-type-token-id="33554443" />

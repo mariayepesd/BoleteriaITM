@@ -69,7 +69,7 @@ if (app.Environment.IsDevelopment())
 }
 
 // POST /api/orders — Crea una orden con patrón SAGA orquestado
-app.MapPost("/api/orders", async (CreateOrderDto dto, IHttpClientFactory factory, FestivalOrdersDbContext db, HttpContext ctx) =>
+app.MapPost("/api/orders", async (CreateOrderDto dto, IHttpClientFactory factory, FestivalOrdersDbContext db, HttpContext ctx, IPublishEndpoint publishEndpoint) =>
 {
     var correlationId = ctx.Request.Headers["X-Correlation-ID"].FirstOrDefault() ?? Guid.NewGuid().ToString();
 
@@ -130,6 +130,16 @@ app.MapPost("/api/orders", async (CreateOrderDto dto, IHttpClientFactory factory
         await db.SaveChangesAsync();
 
         Console.WriteLine($"[SAGA] Orden #{orden.Id} confirmada. Total: ${orden.MontoTotal:N0}");
+
+        await publishEndpoint.Publish<OrderConfirmedEvent>(new OrderConfirmedEvent
+        {
+            OrderId = Guid.NewGuid(), // O usa el GUID de tu correlación / ID de orden si aplica
+            CustomerId = orden.UsuarioId, // "usuario-demo"
+            EventName = "Festival de los Dos Mundos",
+            TicketQuantity = orden.Cantidad,
+            TotalAmount = orden.MontoTotal
+        });
+
         return Results.Ok(new
         {
             OrdenId = orden.Id,

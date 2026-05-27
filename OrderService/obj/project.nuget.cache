@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "9zyHaGGSKBE=",
+  "dgSpecHash": "gJ3bu0Q0UpU=",
   "success": true,
   "projectFilePath": "C:\\Users\\MajoY\\source\\repos\\BoleteriaITM\\OrderService\\OrderService.csproj",
   "expectedPackageFiles": [
@@ -63,10 +63,10 @@
     "C:\\Users\\MajoY\\.nuget\\packages\\polly.extensions\\8.4.1\\polly.extensions.8.4.1.nupkg.sha512",
     "C:\\Users\\MajoY\\.nuget\\packages\\polly.ratelimiting\\8.4.1\\polly.ratelimiting.8.4.1.nupkg.sha512",
     "C:\\Users\\MajoY\\.nuget\\packages\\rabbitmq.client\\7.0.0\\rabbitmq.client.7.0.0.nupkg.sha512",
-    "C:\\Users\\MajoY\\.nuget\\packages\\swashbuckle.aspnetcore\\7.0.0\\swashbuckle.aspnetcore.7.0.0.nupkg.sha512",
-    "C:\\Users\\MajoY\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\7.0.0\\swashbuckle.aspnetcore.swagger.7.0.0.nupkg.sha512",
-    "C:\\Users\\MajoY\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\7.0.0\\swashbuckle.aspnetcore.swaggergen.7.0.0.nupkg.sha512",
-    "C:\\Users\\MajoY\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\7.0.0\\swashbuckle.aspnetcore.swaggerui.7.0.0.nupkg.sha512",
+    "C:\\Users\\MajoY\\.nuget\\packages\\swashbuckle.aspnetcore\\6.4.0\\swashbuckle.aspnetcore.6.4.0.nupkg.sha512",
+    "C:\\Users\\MajoY\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\6.4.0\\swashbuckle.aspnetcore.swagger.6.4.0.nupkg.sha512",
+    "C:\\Users\\MajoY\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\6.4.0\\swashbuckle.aspnetcore.swaggergen.6.4.0.nupkg.sha512",
+    "C:\\Users\\MajoY\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\6.4.0\\swashbuckle.aspnetcore.swaggerui.6.4.0.nupkg.sha512",
     "C:\\Users\\MajoY\\.nuget\\packages\\system.clientmodel\\1.0.0\\system.clientmodel.1.0.0.nupkg.sha512",
     "C:\\Users\\MajoY\\.nuget\\packages\\system.codedom\\6.0.0\\system.codedom.6.0.0.nupkg.sha512",
     "C:\\Users\\MajoY\\.nuget\\packages\\system.composition\\7.0.0\\system.composition.7.0.0.nupkg.sha512",

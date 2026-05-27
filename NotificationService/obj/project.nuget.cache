@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "6Gf1X6OPWLU=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\MajoY\\source\\repos\\BoleteriaITM\\NotificationService\\NotificationService.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\MajoY\\.nuget\\packages\\masstransit\\9.1.1\\masstransit.9.1.1.nupkg.sha512",
+    "C:\\Users\\MajoY\\.nuget\\packages\\masstransit.abstractions\\9.1.1\\masstransit.abstractions.9.1.1.nupkg.sha512",
+    "C:\\Users\\MajoY\\.nuget\\packages\\masstransit.rabbitmq\\9.1.1\\masstransit.rabbitmq.9.1.1.nupkg.sha512",
+    "C:\\Users\\MajoY\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.8\\microsoft.aspnetcore.openapi.10.0.8.nupkg.sha512",
+    "C:\\Users\\MajoY\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512",
+    "C:\\Users\\MajoY\\.nuget\\packages\\rabbitmq.client\\7.2.1\\rabbitmq.client.7.2.1.nupkg.sha512"
+  ],
+  "logs": []
+}

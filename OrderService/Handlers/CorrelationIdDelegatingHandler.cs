@@ -1,8 +1,3 @@
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Linq;
-using Microsoft.AspNetCore.Http;
 
 namespace Itm.Order.Api.Handlers;
 

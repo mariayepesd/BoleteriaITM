@@ -41,8 +41,8 @@ services:
     image: redis:7-alpine
     container_name: itm_festival_redis
     ports:
-      - "6379:6379"     # Puerto estándar de Redis
-    command: redis-server --appendonly yes # Persistencia de datos básica
+      - "6379:6379"
+    command: redis-server --appendonly yes
     volumes:
       - redis_data:/data
     networks:
@@ -54,10 +54,10 @@ services:
     container_name: itm_festival_elasticsearch
     environment:
       - discovery.type=single-node
-      - xpack.security.enabled=false # Deshabilitado solo para desarrollo local ágil
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m" # Límites de memoria para que no sature tu PC
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ports:
-      - "9200:9200"     # API HTTP de Elasticsearch
+      - "9200:9200"
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
     networks:
@@ -68,12 +68,103 @@ services:
     image: qdrant/qdrant:latest
     container_name: itm_festival_qdrant
     ports:
-      - "6333:6333"     # API HTTP
-      - "6334:6334"     # Puerto gRPC (ideal para máxima velocidad)
+      - "6333:6333"
+      - "6334:6334"
     volumes:
       - qdrant_data:/qdrant/storage
     networks:
       - festival_network
+
+  # --- SERVICIO DE INVENTARIO (InventoryService) ---
+  inventory-service:
+    build:
+      context: ./InventoryService   # <--- CORREGIDO: Contexto local directo
+      dockerfile: Dockerfile        # <--- CORREGIDO: El archivo está adentro
+    container_name: itm_festival_inventory_service
+    ports:
+      - "5273:8080"
+      - "7198:8443"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: "http://+:8080;https://+:8443"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=FestivalInventoryDb;User Id=sa;Password=ITM_Festival_2026!;TrustServerCertificate=True;"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    networks:
+      - festival_network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"] # <--- CORREGIDO: Compatible con .NET
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # --- SERVICIO DE ÓRDENES (OrderService) ---
+ # --- SERVICIO DE ÓRDENES (OrderService) ---
+  order-service:
+    build:
+      context: ./OrderService
+      dockerfile: Dockerfile
+    container_name: itm_festival_order_service
+    ports:
+      - "5280:8080"
+      - "7199:8443"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: "http://+:8080;https://+:8443"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=FestivalOrdersDb;User Id=sa;Password=ITM_Festival_2026!;TrustServerCertificate=True;"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    networks:
+      - festival_network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # --- SERVICIO DE NOTIFICACIONES (NotificationService) ---
+  notification-service: # <--- CORREGIDO: Alineado perfectamente con dos espacios
+    build:
+      context: .
+      dockerfile: NotificationService/Dockerfile
+    container_name: itm_festival_notification_service
+    ports:
+      - "5290:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: "http://+:8080"
+    depends_on:
+      - rabbitmq
+    networks:
+      - festival_network
+
+  # --- PUERTA DE ENLACE (API Gateway con YARP) ---
+  api-gateway:
+    build:
+      context: ./ApiGateway         # <--- CORREGIDO
+      dockerfile: Dockerfile        # <--- CORREGIDO
+    container_name: itm_festival_api_gateway
+    ports:
+      - "5000:8080"
+      - "5001:8443"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: "http://+:8080;https://+:8443"
+    depends_on:
+      - inventory-service
+      - order-service
+    networks:
+      - festival_network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"] # <--- CORREGIDO
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
 # --- RED INTERNA DEL ECOSISTEMA ---
 networks:

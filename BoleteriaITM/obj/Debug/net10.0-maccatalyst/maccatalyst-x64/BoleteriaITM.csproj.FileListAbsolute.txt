@@ -305,3 +305,4 @@ C:\Users\MajoY\source\repos\BoleteriaITM\BoleteriaITM\obj\Debug\net10.0-maccatal
 C:\Users\MajoY\source\repos\BoleteriaITM\BoleteriaITM\obj\Debug\net10.0-maccatalyst\maccatalyst-x64\BoleteriaITM.pdb
 C:\Users\MajoY\source\repos\BoleteriaITM\BoleteriaITM\obj\Debug\net10.0-maccatalyst\maccatalyst-x64\BoleteriaITM.genruntimeconfig.cache
 C:\Users\MajoY\source\repos\BoleteriaITM\BoleteriaITM\obj\Debug\net10.0-maccatalyst\maccatalyst-x64\ref\BoleteriaITM.dll
+C:\Users\MajoY\source\repos\BoleteriaITM\BoleteriaITM\obj\Debug\net10.0-maccatalyst\maccatalyst-x64\BoleteriaITM.sourcelink.json

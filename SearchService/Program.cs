@@ -134,7 +134,7 @@ app.MapGet("/api/search/semantic", async (string q, QdrantClient qdClient) =>
 app.MapPost("/api/search/index", async (ElasticsearchClient esClient, QdrantClient qdClient) =>
 {
     await IndexarEventosAsync(esClient, qdClient);
-    return Results.Ok(new { Message = "Re-indexación completada", EventosIndexados = SeedEventos.Count });
+    return Results.Ok(new { Message = "Re-indexación completada", EventosIndexados = VibeVector.SeedEventos.Count });
 })
 .WithName("ReIndexar");
 
@@ -149,7 +149,7 @@ static async Task IndexarEventosAsync(ElasticsearchClient esClient, QdrantClient
     if (!existeIndex.Exists)
         await esClient.Indices.CreateAsync("eventos");
 
-    foreach (var ev in SeedEventos)
+    foreach (var ev in VibeVector.SeedEventos)
     {
         await esClient.IndexAsync(ev, idx => idx.Index("eventos").Id(ev.Id));
     }
@@ -162,7 +162,7 @@ static async Task IndexarEventosAsync(ElasticsearchClient esClient, QdrantClient
             new VectorParams { Size = VibeVector.Dimensions, Distance = Distance.Cosine });
     }
 
-    var puntos = SeedEventos.Select(ev => new PointStruct
+    var puntos = VibeVector.SeedEventos.Select(ev => new PointStruct
     {
         Id      = (ulong)ev.Id,
         Vectors = ev.VibeVector,
@@ -230,7 +230,39 @@ static float[] CalcularVectorVibe(string query)
 
 // ─── Seed data (espeja el seed de InventoryService) ──────────────────────────
 
-static class VibeVector { public const int Dimensions = 8; }
+static class VibeVector
+{
+    public const int Dimensions = 8;
+
+    public static readonly List<EventoDoc> VibeVector.SeedEventos =
+    [
+        // ── Medellín ──
+        new(1, "Festival de los Dos Mundos", "Medellín", "General",
+            "El evento más grande de Colombia. Música tropical, rock y electrónica en el corazón de Medellín.",
+            new[] { 0.80f, 0.20f, 0.90f, 0.10f, 0.00f, 0.90f, 0.70f, 0.60f }),
+
+        new(2, "Festival de los Dos Mundos", "Medellín", "VIP",
+            "Acceso VIP con áreas exclusivas, barra libre y vista preferencial al escenario principal.",
+            new[] { 0.60f, 0.30f, 0.80f, 0.10f, 0.40f, 0.60f, 0.90f, 0.30f }),
+
+        new(3, "Festival de los Dos Mundos", "Medellín", "Palco",
+            "Experiencia Palco: zona reservada para los coleccionistas. Canapés, sommelier y producción clásica.",
+            new[] { 0.50f, 0.10f, 0.70f, 0.00f, 0.70f, 0.40f, 0.90f, 0.40f }),
+
+        // ── Madrid ──
+        new(4, "Festival de los Dos Mundos", "Madrid", "General",
+            "La energía del rock madrileño se fusiona con electrónica de talla mundial. Noche de alta intensidad.",
+            new[] { 0.90f, 0.50f, 0.20f, 0.80f, 0.10f, 0.90f, 0.80f, 0.40f }),
+
+        new(5, "Festival de los Dos Mundos", "Madrid", "VIP",
+            "Disfruta el festival con acceso VIP, zona de networking y backstage para los mayores artistas de rock.",
+            new[] { 0.70f, 0.40f, 0.20f, 0.60f, 0.40f, 0.70f, 0.90f, 0.30f }),
+
+        new(6, "Festival de los Dos Mundos", "Madrid", "Palco",
+            "Palco exclusivo con vista panorámica. El ambiente más sofisticado del festival europeo.",
+            new[] { 0.40f, 0.20f, 0.10f, 0.30f, 0.90f, 0.40f, 0.90f, 0.50f })
+    ];
+}
 
 record EventoDoc(
     int     Id,
@@ -240,32 +272,3 @@ record EventoDoc(
     string  Descripcion,
     float[] VibeVector   // no se indexa en ES, solo en Qdrant
 );
-
-static readonly List<EventoDoc> SeedEventos =
-[
-    // ── Medellín ──
-    new(1, "Festival de los Dos Mundos", "Medellín", "General",
-        "El evento más grande de Colombia. Música tropical, rock y electrónica en el corazón de Medellín.",
-        new[] { 0.80f, 0.20f, 0.90f, 0.10f, 0.00f, 0.90f, 0.70f, 0.60f }),
-
-    new(2, "Festival de los Dos Mundos", "Medellín", "VIP",
-        "Acceso VIP con áreas exclusivas, barra libre y vista preferencial al escenario principal.",
-        new[] { 0.60f, 0.30f, 0.80f, 0.10f, 0.40f, 0.60f, 0.90f, 0.30f }),
-
-    new(3, "Festival de los Dos Mundos", "Medellín", "Palco",
-        "Experiencia Palco: zona reservada para los coleccionistas. Canapés, sommelier y producción clásica.",
-        new[] { 0.50f, 0.10f, 0.70f, 0.00f, 0.70f, 0.40f, 0.90f, 0.40f }),
-
-    // ── Madrid ──
-    new(4, "Festival de los Dos Mundos", "Madrid", "General",
-        "La energía del rock madrileño se fusiona con electrónica de talla mundial. Noche de alta intensidad.",
-        new[] { 0.90f, 0.50f, 0.20f, 0.80f, 0.10f, 0.90f, 0.80f, 0.40f }),
-
-    new(5, "Festival de los Dos Mundos", "Madrid", "VIP",
-        "Disfruta el festival con acceso VIP, zona de networking y backstage para los mayores artistas de rock.",
-        new[] { 0.70f, 0.40f, 0.20f, 0.60f, 0.40f, 0.70f, 0.90f, 0.30f }),
-
-    new(6, "Festival de los Dos Mundos", "Madrid", "Palco",
-        "Palco exclusivo con vista panorámica. El ambiente más sofisticado del festival europeo.",
-        new[] { 0.40f, 0.20f, 0.10f, 0.30f, 0.90f, 0.40f, 0.90f, 0.50f })
-];

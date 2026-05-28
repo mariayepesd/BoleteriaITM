@@ -156,7 +156,7 @@ static async Task IndexarEventosAsync(ElasticsearchClient esClient, QdrantClient
 
     // ── Qdrant ─────────────────────────────────────────────────────────────────
     var colecciones = await qdClient.ListCollectionsAsync();
-    if (!colecciones.Any(c => c.Name == "eventos"))
+    if (!colecciones.Any(c => c == "eventos"))
     {
         await qdClient.CreateCollectionAsync("eventos",
             new VectorParams { Size = VibeVector.Dimensions, Distance = Distance.Cosine });

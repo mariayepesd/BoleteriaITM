@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using Festival.Contracts;
 using Itm.Inventory.Api.Protos;
 using Itm.Order.Api.Data;
 using Itm.Order.Api.Data.Entities;

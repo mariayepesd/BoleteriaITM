@@ -17,15 +17,16 @@ jobs:
 
     steps:
       - name: Checkout código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Configurar .NET ${{ env.DOTNET_VERSION }}
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v4.3.1
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restaurar dependencias
         run: |
+          dotnet restore Festival.Contracts/Festival.Contracts.csproj
           dotnet restore InventoryService/InventoryService.csproj
           dotnet restore OrderService/OrderService.csproj
           dotnet restore NotificationService/NotificationService.csproj
@@ -55,7 +56,7 @@ jobs:
 
     steps:
       - name: Checkout código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Login a Docker Hub
         uses: docker/login-action@v3

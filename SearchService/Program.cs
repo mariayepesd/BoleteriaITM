@@ -234,7 +234,7 @@ static class VibeVector
 {
     public const int Dimensions = 8;
 
-    public static readonly List<EventoDoc> VibeVector.SeedEventos =
+    public static readonly List<EventoDoc> SeedEventos =
     [
         // ── Medellín ──
         new(1, "Festival de los Dos Mundos", "Medellín", "General",
